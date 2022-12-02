@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'flutter_webview.dart' as flutterWV;
+import 'inapp_webview.dart' as inappWV;
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -33,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: Text("AppBar with tabs"),
@@ -42,14 +46,16 @@ class _MyHomePageState extends State<MyHomePage> {
               Text("First Tab"),
               Text("Second Tab"),
               Text("Third Tab"),
+              Text("Four Tab"),
             ],
           ),
         ),
         body: TabBarView(
-          children: <Widget>[
-            Text("First Tab Choose"),
-            Text("Second Tab Choose"),
-            Text("Third Tab Choose")
+          children: [
+            flutterWV.CustomWebview(),
+            inappWV.CustomWebview(),
+            flutterWV.CustomWebview(),
+            inappWV.CustomWebview(),
           ],
         ),
       ),
