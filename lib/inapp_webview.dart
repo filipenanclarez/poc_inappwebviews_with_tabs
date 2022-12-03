@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -15,7 +18,50 @@ class _CustomWebviewState extends State<CustomWebview>
   @override
   bool get wantKeepAlive => true;
 
-  String timeString = '';
+  String webViewMsg = '';
+
+  final GlobalKey webViewChild = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<MyNotification>(
+      key: webViewChild,
+      onNotification: (e) {
+        debugPrint('webview message: ${e.mensagem}');
+        webViewMsg = e.mensagem;
+        setState(() {});
+        return false;
+      },
+      child: Column(
+        children: [
+          Text('Update by webview: $webViewMsg'),
+          Expanded(
+              child: WebViewChild(
+            key: webViewChild,
+          )),
+        ],
+      ),
+    );
+  }
+}
+
+class MyNotification extends Notification {
+  String mensagem;
+
+  MyNotification(this.mensagem);
+}
+
+class WebViewChild extends StatefulWidget {
+  const WebViewChild({super.key});
+
+  @override
+  State<WebViewChild> createState() => _WebViewChildState();
+}
+
+class _WebViewChildState extends State<WebViewChild>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
   InAppWebViewController? webViewController;
 
@@ -24,24 +70,39 @@ class _CustomWebviewState extends State<CustomWebview>
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Update time: $timeString'),
         Expanded(
           child: InAppWebView(
-            onWebViewCreated: (controller) {
+            onWebViewCreated: (controller) async {
               webViewController = controller;
+              if (!Platform.isAndroid ||
+                  await AndroidWebViewFeature.isFeatureSupported(
+                      AndroidWebViewFeature.WEB_MESSAGE_LISTENER)) {
+                await webViewController!.addWebMessageListener(
+                  WebMessageListener(
+                      jsObjectName: "CHANNEL",
+                      allowedOriginRules: Set.from(['*']),
+                      onPostMessage:
+                          ((message, sourceOrigin, isMainFrame, replyProxy) {
+                        if (message != null) {
+                          MyNotification(message).dispatch(context);
+                        }
+                      })),
+                );
+              }
             },
             initialUrlRequest:
                 URLRequest(url: Uri.parse("https://flutter.dev")),
           ),
         ),
         ElevatedButton(
-          onPressed: () {
-            webViewController?.loadUrl(
-                urlRequest: URLRequest(url: Uri.parse("https://flutter.dev")));
-            timeString = DateTime.now().toIso8601String();
+          onPressed: () async {
+            var page = await rootBundle.loadString('assets/page.html');
+
+            webViewController?.loadData(data: page);
+
             setState(() {});
           },
-          child: Text('Update time'),
+          child: Text('Load Test Page'),
         )
       ],
     );

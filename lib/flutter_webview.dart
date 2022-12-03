@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -15,8 +16,41 @@ class _CustomWebviewState extends State<CustomWebview>
   @override
   bool get wantKeepAlive => true;
 
-  String timeString = '';
+  String webViewMsg = '';
 
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<MyNotification>(
+        onNotification: (e) {
+          debugPrint('webview message: ${e.mensagem}');
+          webViewMsg = e.mensagem;
+          setState(() {});
+          return false;
+        },
+        child: Column(
+          children: [
+            Text('Update by webview: $webViewMsg'),
+            Expanded(child: WebViewChild()),
+          ],
+        ));
+  }
+}
+
+// classe customizada de notificação para receber o callback dos webviews com o notifylistener
+class MyNotification extends Notification {
+  String mensagem;
+
+  MyNotification(this.mensagem);
+}
+
+class WebViewChild extends StatefulWidget {
+  const WebViewChild({super.key});
+
+  @override
+  State<WebViewChild> createState() => _WebViewChildState();
+}
+
+class _WebViewChildState extends State<WebViewChild> {
   WebViewController? webViewController;
 
   @override
@@ -24,24 +58,37 @@ class _CustomWebviewState extends State<CustomWebview>
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Update time: $timeString'),
         Expanded(
           child: WebView(
+            javascriptMode: JavascriptMode.unrestricted,
             onWebViewCreated: (controller) {
               webViewController = controller;
             },
             initialUrl: 'https://flutter.dev',
+            javascriptChannels: <JavascriptChannel>{
+              channel(context),
+            },
           ),
         ),
         ElevatedButton(
-          onPressed: () {
-            webViewController?.loadUrl("https://flutter.dev");
-            timeString = DateTime.now().toIso8601String();
+          onPressed: () async {
+            var page = await rootBundle.loadString('assets/page.html');
+
+            await webViewController?.loadHtmlString(page);
+            // timeString = DateTime.now().toIso8601String();
             setState(() {});
           },
-          child: Text('Update time'),
+          child: Text('Load Test Page'),
         )
       ],
     );
+  }
+
+  JavascriptChannel channel(BuildContext context) {
+    return JavascriptChannel(
+        name: 'CHANNEL',
+        onMessageReceived: (message) {
+          MyNotification(message.message).dispatch(context);
+        });
   }
 }

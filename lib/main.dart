@@ -43,10 +43,10 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text("AppBar with tabs"),
           bottom: TabBar(
             tabs: <Widget>[
-              Text("First Tab"),
-              Text("Second Tab"),
-              Text("Third Tab"),
-              Text("Four Tab"),
+              Text("FWV1"),
+              Text("InnApp1"),
+              Text("FWV2"),
+              Text("InnApp2"),
             ],
           ),
         ),

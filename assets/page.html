@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript">
+        setInterval(myTimer, 1000);
+        function myTimer() {
+            const d = new Date();
+            document.getElementById("demo").innerHTML = d.toLocaleTimeString();
+            sendToFlutter(d.toLocaleTimeString());
+        }
+
+        function sendToFlutter(message) {    
+
+            if( typeof CHANNEL === 'undefined' || CHANNEL === null ){
+                if( typeof window.chrome === 'undefined' || typeof window.chrome.webview === 'undefined' || window.chrome === null || window.chrome.webview === null){
+                    // apenas envia pelo console mesmo, pois consigo pegar do outro lado
+                    // para android muito antigos            
+                    console.log('sem canal');;
+                    console.log(message);
+                }else{
+                    console.log('windows channel');;
+                    window.chrome.webview.postMessage({ "message": message });
+                }
+            }else{
+                console.log('tem canal, enviando msg: ' + message);
+                CHANNEL.postMessage(message);
+            }    
+        }
+    </script>
+</head>
+<body>
+    <p>Test page</p>
+    <div id="demo"></div>
+</body>
+</html>
