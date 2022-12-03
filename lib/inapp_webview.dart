@@ -37,7 +37,7 @@ class _CustomWebviewState extends State<CustomWebview>
           Text('Update by webview: $webViewMsg'),
           Expanded(
               child: WebViewChild(
-            key: webViewChild,
+            key: widget.key,
           )),
         ],
       ),
@@ -84,6 +84,7 @@ class _WebViewChildState extends State<WebViewChild>
                       onPostMessage:
                           ((message, sourceOrigin, isMainFrame, replyProxy) {
                         if (message != null) {
+                          debugPrint('recebi mensagem ${widget.key}');
                           MyNotification(message).dispatch(context);
                         }
                       })),

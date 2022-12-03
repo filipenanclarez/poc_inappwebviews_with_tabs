@@ -52,10 +52,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: TabBarView(
           children: [
-            flutterWV.CustomWebview(),
-            inappWV.CustomWebview(),
-            flutterWV.CustomWebview(),
-            inappWV.CustomWebview(),
+            flutterWV.CustomWebview(key: Key('1')),
+            inappWV.CustomWebview(key: Key('2')),
+            flutterWV.CustomWebview(key: Key('3')),
+            inappWV.CustomWebview(key: Key('4')),
           ],
         ),
       ),

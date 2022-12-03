@@ -30,7 +30,10 @@ class _CustomWebviewState extends State<CustomWebview>
         child: Column(
           children: [
             Text('Update by webview: $webViewMsg'),
-            Expanded(child: WebViewChild()),
+            Expanded(
+                child: WebViewChild(
+              key: widget.key,
+            )),
           ],
         ));
   }
@@ -88,6 +91,7 @@ class _WebViewChildState extends State<WebViewChild> {
     return JavascriptChannel(
         name: 'CHANNEL',
         onMessageReceived: (message) {
+          debugPrint('recebi mensagem ${widget.key}');
           MyNotification(message.message).dispatch(context);
         });
   }
