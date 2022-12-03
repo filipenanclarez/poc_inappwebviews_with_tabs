@@ -16,6 +16,9 @@ class _CustomWebviewState extends State<CustomWebview>
   bool get wantKeepAlive => true;
 
   String timeString = '';
+
+  WebViewController? webViewController;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -24,11 +27,15 @@ class _CustomWebviewState extends State<CustomWebview>
         Text('Update time: $timeString'),
         Expanded(
           child: WebView(
+            onWebViewCreated: (controller) {
+              webViewController = controller;
+            },
             initialUrl: 'https://flutter.dev',
           ),
         ),
         ElevatedButton(
           onPressed: () {
+            webViewController?.loadUrl("https://flutter.dev");
             timeString = DateTime.now().toIso8601String();
             setState(() {});
           },
