@@ -65,6 +65,8 @@ class _WebViewChildState extends State<WebViewChild>
 
   InAppWebViewController? webViewController;
 
+  double zoomScale = 0;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -93,17 +95,40 @@ class _WebViewChildState extends State<WebViewChild>
             },
             initialUrlRequest:
                 URLRequest(url: Uri.parse("https://flutter.dev")),
+            onLoadStop: (controller, url) async {
+              zoomScale = (await controller.getZoomScale())!;
+            },
           ),
         ),
+        // ElevatedButton(
+        //   onPressed: () async {
+        //     var page = await rootBundle.loadString('assets/page.html');
+
+        //     webViewController?.loadData(data: page);
+
+        //     setState(() {});
+        //   },
+        //   child: Text('Load Test Page'),
+        // ),
         ElevatedButton(
           onPressed: () async {
-            var page = await rootBundle.loadString('assets/page.html');
-
-            webViewController?.loadData(data: page);
+            zoomScale += 10;
+            await webViewController?.zoomBy(zoomFactor: zoomScale);
+            debugPrint('terimniei de setar o zoom');
 
             setState(() {});
           },
-          child: Text('Load Test Page'),
+          child: Text('zoom in'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            zoomScale -= 10;
+            await webViewController?.zoomBy(zoomFactor: zoomScale);
+            debugPrint('terimniei de setar o zoom');
+
+            setState(() {});
+          },
+          child: Text('zoom out'),
         )
       ],
     );

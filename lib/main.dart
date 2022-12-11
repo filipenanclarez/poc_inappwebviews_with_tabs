@@ -37,25 +37,25 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 1,
       child: Scaffold(
         appBar: AppBar(
           title: Text("AppBar with tabs"),
           bottom: TabBar(
             tabs: <Widget>[
-              Text("FWV1"),
+              // Text("FWV1"),
               Text("InnApp1"),
-              Text("FWV2"),
-              Text("InnApp2"),
+              // Text("FWV2"),
+              // Text("InnApp2"),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            flutterWV.CustomWebview(key: Key('1')),
+            // flutterWV.CustomWebview(key: Key('1')),
             inappWV.CustomWebview(key: Key('2')),
-            flutterWV.CustomWebview(key: Key('3')),
-            inappWV.CustomWebview(key: Key('4')),
+            // flutterWV.CustomWebview(key: Key('3')),
+            // inappWV.CustomWebview(key: Key('4')),
           ],
         ),
       ),
